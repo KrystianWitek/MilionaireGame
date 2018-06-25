@@ -1,0 +1,25 @@
+KOMENDY WYSY£ANE PRZEZ SERWER:
+
+GIVE_ME_ANSWER - serwer jest gotowy do odebrania odpowiedzi
+
+SCORE - wysy³anie ostatecznej liczby punktów danego klienta
+
+GAME_OVER - informacja o zakoñczeniu gry
+
+START_OF_QUESTION - pocz¹tek wysy³anego pytania
+END_OF_QUESTION - koniec wysy³anego pytania
+
+ASKED - zwrot informacji, czy odpowiedŸ klienta na pytaniew grze jest poprawna
+END_ASKED - koniec wysy³anej informacji o poprawnej odpowiedzi
+
+NEXT_QUESTION - komunikat o wczytywaniu kolejnego pytania + informacja o aktualnym stanie punktów obu graczy
+END_NEXT_QUESTION - koniec komunikatu
+
+CONNECTION - sprawdzanie stanu po³¹czenia gracza
+
+START_NICK - pobieranie nicku od gracza
+END_NICK - pobieranie gracza zakoñczone sukcesem
+
+KOMENDY WYSY£ANE PRZEZ KLIENTA:
+
+OK - gracz jest po³¹czony z serwerem
