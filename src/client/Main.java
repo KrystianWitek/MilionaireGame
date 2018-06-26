@@ -5,6 +5,7 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.rmi.ServerException;
+import java.sql.Time;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
@@ -72,75 +73,88 @@ public class Main {
 
             String message;
             do{
-                message = in.readLine();
-                switch (message) {
-                    case "START_NICK": {
-                        message = in.readLine();
-                        System.out.println(message);
-                        out.println(nick);
-                        out.flush();
-                        break;
-                    }
-                    case "END_NICK": {
-                        message = in.readLine();
-                        System.out.println(message);
-                        break;
-                    }
-                    case "CONNECTION": {
-                        message = in.readLine();
-                        System.out.println(message);
-
-                        out.println("OK");
-                        out.flush();
-                        break;
-                    }
-                    case "SCORE": {
-                        boolean endScore = false;
-                        readMessages(endScore,"GAME_OVER");
-
-                        gameOver = true;
-                        System.out.println("Gra zostala zakonczona");
-                        System.out.println("===========================================");
-                        socket.close();
-                        break;
-                    }
-                    case "START_OF_QUESTION": {
-                        System.out.println("Runda " + roundCounter++);
-                        boolean endOfQuestion = false;
-                        readMessages(endOfQuestion, "END_OF_QUESTION");
-                        break;
-                    }
-                    case "GIVE_ME_ANSWER": {
-                        message = in.readLine();
-                        System.out.println(message);
-                        Scanner scanner = new Scanner(System.in);
-                        String tmp = scanner.nextLine();
-                        out.println(tmp);
-                        out.flush();
-                        break;
-                    }
-                    case "ASKED": {
-                        boolean asked = false;
-                        readMessages(asked,"END_ASKED");
-                        try{
-
-                            TimeUnit.SECONDS.sleep(1);
-                        } catch (InterruptedException ex){
-                            System.out.println("Problem z odliczaniem czasu");
+                if(in.readLine().equals("+-+")){
+                    message = in.readLine();
+                    switch (message) {
+                        case "PLAYER_DISCONNECTED":{
+                            System.out.println("\n=======================================");
+                            System.out.println("Przeciwnik sie rozłączył, wygrałeś grę :D");
+                            break;
                         }
-                        break;
-                    }
-                    case "NEXT_QUESTION": {
-                        boolean nextQuestion = false;
-                        readMessages(nextQuestion,"END_NEXT_QUESTION");
-                        try{
-
-                            TimeUnit.SECONDS.sleep(3);
-                        } catch (InterruptedException ex){
-                            System.out.println("Problem z odliczaniem czasu");
+                        case "START_NICK": {
+                            message = in.readLine();
+                            System.out.println(message);
+                            out.println(nick);
+                            out.flush();
+                            break;
                         }
-                        break;
+                        case "END_NICK": {
+                            message = in.readLine();
+                            System.out.println(message);
+                            break;
+                        }
+                        case "CONNECTION": {
+                            message = in.readLine();
+                            System.out.println(message);
+
+                            out.println("CONNECTION_OK");
+                            out.flush();
+                            break;
+                        }
+                        case "SCORE": {
+                            boolean endScore = false;
+                            readMessages(endScore, "END_SCORE");
+                            break;
+                        }
+                        case "GAME_OVER":{
+                            gameOver = true;
+                            System.out.println("Gra zostala zakonczona");
+                            System.out.println("===========================================");
+                            socket.close();
+                            break;
+                        }
+                        case "START_OF_QUESTION": {
+                            System.out.println("Runda " + roundCounter++);
+                            boolean endOfQuestion = false;
+                            readMessages(endOfQuestion, "END_OF_QUESTION");
+                            break;
+                        }
+                        case "GIVE_ME_ANSWER": {
+                            message = in.readLine();
+                            System.out.println(message);
+                            Scanner scanner = new Scanner(System.in);
+                            String answer = scanner.nextLine();
+
+                            out.println("+-+");
+                            out.println(answer.toLowerCase());
+                            out.flush();
+                            break;
+                        }
+                        case "ASKED": {
+                            boolean asked = false;
+                            readMessages(asked,"END_ASKED");
+                            try{
+                                TimeUnit.SECONDS.sleep(1);
+                            } catch (InterruptedException ex){
+                                System.out.println("Problem z odliczaniem czasu");
+                            }
+                            break;
+                        }
+                        case "NEXT_QUESTION": {
+                            boolean nextQuestion = false;
+                            readMessages(nextQuestion,"END_NEXT_QUESTION");
+                            try{
+
+                                TimeUnit.SECONDS.sleep(3);
+                            } catch (InterruptedException ex){
+                                System.out.println("Problem z odliczaniem czasu");
+                            }
+                            break;
+                        }
                     }
+                }
+                else{
+                    System.out.println("Otrzymano zły komunikat ze strony serwera!");
                 }
             } while (!gameOver || !socket.isClosed());
         } catch (ServerException ex){

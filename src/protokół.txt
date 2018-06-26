@@ -3,6 +3,7 @@ KOMENDY WYSY£ANE PRZEZ SERWER:
 GIVE_ME_ANSWER - serwer jest gotowy do odebrania odpowiedzi
 
 SCORE - wysy³anie ostatecznej liczby punktów danego klienta
+END_SCORE - wysy³anie zakoñczone
 
 GAME_OVER - informacja o zakoñczeniu gry
 
@@ -20,6 +21,11 @@ CONNECTION - sprawdzanie stanu po³¹czenia gracza
 START_NICK - pobieranie nicku od gracza
 END_NICK - pobieranie gracza zakoñczone sukcesem
 
+PLAYER_DISCONNECTED - informuje klienta, ¿e przeciwnik siê roz³¹czy³
+
 KOMENDY WYSY£ANE PRZEZ KLIENTA:
 
-OK - gracz jest po³¹czony z serwerem
+CONNECTION_OK - gracz jest po³¹czony z serwerem
+
+
+"+-+" <- to jest znak, który musi staæ przed ka¿d¹ komend¹

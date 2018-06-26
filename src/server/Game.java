@@ -7,6 +7,7 @@ import java.util.List;
 
 class Game {
 
+    private boolean gameExit = false;
     private int gameID;
     private Player p1 = null;
     private Player p2 = null;
@@ -38,8 +39,12 @@ class Game {
         for(Question q : questionPool.getListOfQuestions()){
 
             // uruchamiam funkcję obsługi pojedyńczego pytania, tj. pojedyńcza runda
+            if(!gameExit)
                 askPlayers(q);
         }
+        // porównanie wyników
+        comparePlayersScores();
+
         endGame();
     }
 
@@ -48,18 +53,18 @@ class Game {
         PrintWriter out;
 
         // wysyłam pytania do klientów
-
-        for (Player p : players) {
-            try {
+        try {
+            for (Player p : players) {
                 out = new PrintWriter(new OutputStreamWriter(p.getSocket().getOutputStream()));
                 sendQuestion(out, question);
+                }
             } catch (IOException ex) {
-                System.out.println("Błąd podczas wysyłania pytania do gracza");
-            }
+            System.out.println("Błąd podczas wysyłania pytania do gracza");
         }
+
         int answers = 0;
         int askForAnswer = 0;
-        String msg ="test";
+        String msg;
 
         //  pętla obsługuje wczytywanie odpowiedzi od klientów
 
@@ -72,32 +77,38 @@ class Game {
                     // wysyłam do gracza prośbę o uzyskanine odpowiedzi
 
                     if (askForAnswer != 2) {
+                        out.println("+-+");
                         out.println("GIVE_ME_ANSWER");
-                        out.println("Podaj odpowiedż: ");
+                        out.println("Podaj odpowiedż");
                         out.flush();
                         askForAnswer++;
                     }
 
-                    // jeśli gracz odpowiedział
+                    // jeśli obaj gracze dostali powiadomienie to zaczynam pobierać od nich odpowiedzi
 
-                    if (in.ready()) {
-                        msg = in.readLine();
-                        System.out.println("Player " + p.getNick() + " odpowiedział: " + msg);
-                        if (msg.equals(question.getRightAnswer())) {
-                            correctAnswer(out, p);
-                        } else {
-                            wrongAnswer(out, p);
+                    if(askForAnswer == 2 && answers != 2){
+                        if (in.readLine().equals("+-+")) {
+                            msg = in.readLine();
+                            System.out.println("Player " + p.getNick() + " odpowiedział: " + msg);
+                            if (msg.equals(question.getRightAnswer())) {
+                                correctAnswer(out, p);
+                            } else {
+                                wrongAnswer(out, p);
+                            }
+                            answers++;
                         }
-                        answers++;
+                        else{
+                            System.out.println("Zły komunikat od klienta!");
+                        }
                     }
                 }
             }
             notifyPlayers();
-        } catch (SocketTimeoutException ex){
-            System.out.println("Koniec czasu na odpowiedz klienta");
+
         } catch (SocketException ex) {
             System.out.println("Jeden z graczy się rozłączył");
-            ex.printStackTrace();
+            whenPlayerDisconnected();
+//            ex.printStackTrace();
         } catch (IOException ex) {
             System.out.println("Nie mozna powiadomic gracza");
         }
@@ -105,23 +116,20 @@ class Game {
 
     private void endGame(){
         try {
-
-            // porównanie wyników
-            comparePlayersScores();
-
             // pętla powiadamia graczy o ich wyniku i o tym kto wygrał mecz
 
             for(Player p : players) {
                 PrintWriter out = new PrintWriter(new OutputStreamWriter(p.getSocket().getOutputStream()));
+                out.println("+-+");
                 out.println("SCORE");
-                out.println("Your score = " + p.getScore());
+                out.println("Twój wynik = " + p.getScore());
 
                 out.println(findWinner(p));
                 out.flush();
 
-                out.println("GAME_OVER");
-                out.flush();
-                out.close();
+                out.println("END_SCORE");
+
+                sendEndGame(out);
             }
             System.out.println("Gracze otrzymali swoje wyniki --- KONIEC GRY");
 
@@ -129,10 +137,35 @@ class Game {
             System.out.println("Nie mozna powiadomic gracza");}
     }
 
+    private void sendEndGame(PrintWriter out) throws IOException{
+        out.println("+-+");
+        out.println("GAME_OVER");
+        out.flush();
+    }
+
+    private void whenPlayerDisconnected(){
+        try {
+            for (Player p : players) {
+                PrintWriter out = new PrintWriter(new OutputStreamWriter(p.getSocket().getOutputStream()));
+
+                gameExit = true;
+                out.println("+-+");
+                out.println("PLAYER_DISCONNECTED");
+                out.flush();
+
+                sendEndGame(out);
+            }
+        } catch (IOException e) {
+            System.out.println("Powiadamianie gracza nie powiodło się!");
+//            e.printStackTrace();
+        }
+    }
+
     private void sendQuestion(PrintWriter out, Question question){
 
         // funkcja wysyła pytanie do gracza
 
+        out.println("+-+");
         out.println("START_OF_QUESTION");
         out.println("================================================================");
         out.println(question.getContent());
@@ -149,6 +182,7 @@ class Game {
 
         // funkcja wysyła wiadomość do gracza o poprawnej odpowiedzi
 
+        out.println("+-+");
         out.println("ASKED");
         out.println("Poprawna odpowiedź");
         p.setScore(p.getScore() + 1);
@@ -161,6 +195,7 @@ class Game {
 
         // funkcja wysyła wiadomość do gracza o złej odpowiedzi
 
+        out.println("+-+");
         out.println("ASKED");
         out.println("Zła odpowiedź");
         out.println("================================================================");
@@ -179,6 +214,7 @@ class Game {
         try{
             for(Player p : players){
                 PrintWriter out = new PrintWriter(new OutputStreamWriter(p.getSocket().getOutputStream()));
+                out.println("+-+");
                 out.println("NEXT_QUESTION");
                 out.println(currentScores());
                 out.println("\nPobieranie kolejnego pytania...\n");
@@ -189,7 +225,7 @@ class Game {
             e.printStackTrace();
         }
         System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        System.out.println("NR GRY: "+ gameID + " GRACZE: "+ p1.getNick() +" || "+ p2.getNick());
+        System.out.println("NR GRY: "+ gameID + " GRACZE: "+ p1.getNick() +" "+ p1.getScore() +" || "+ p2.getNick() +" "+ p2.getScore());
         System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++");
     }
 

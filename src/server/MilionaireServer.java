@@ -39,7 +39,6 @@ public class MilionaireServer {
         while(isServerWorking){
             try{
                 socket = serverSocket.accept();
-                socket.setSoTimeout(15000);
                 playerQueue.add(createPlayer(socket));
 
                 // gdy serwer znajdzie 2 graczy uruchamia obsługę gry
@@ -58,9 +57,8 @@ public class MilionaireServer {
                 else System.out.println("Oczekiwanie na drugiego gracza...");
 
             } catch(SocketException ex){
-                System.out.println("Gracz sie rozlaczyl, usuwanie gracza z kolejki...");
-                playerQueue.remove();
-//            ex.printStackTrace();
+                System.out.println("Gracz " + playerQueue.remove().getNick() +" sie rozlaczyl, usuwanie gracza z kolejki...");
+//                ex.printStackTrace();
             } catch (IOException e) {
                 System.out.println("Problem z IO");
             }
@@ -84,17 +82,17 @@ public class MilionaireServer {
             in = new BufferedReader(new InputStreamReader(p.getSocket().getInputStream()));
             out = new PrintWriter(new OutputStreamWriter(p.getSocket().getOutputStream()));
 
+            out.println("+-+");
             out.println("CONNECTION");
             out.println("Serwer sprawdza, czy gracz jest nadal połączony...");
             out.flush();
 
             String msg = in.readLine();
-//            System.out.println(msg);
-            if(msg.equals("OK")){
+            if(msg.equals("CONNECTION_OK")){
                 check++;
                 System.out.println("Gracz " + p.getNick() + " jest połączony");
             }
-            else System.out.println("Nie znaleziono gracza!");
+            else System.out.println("Nie znaleziono gracza " + p.getNick() + "!");
         }
 
         System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
@@ -110,6 +108,7 @@ public class MilionaireServer {
             BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             PrintWriter out  = new PrintWriter(new OutputStreamWriter(s.getOutputStream()));
 
+            out.println("+-+");
             out.println("START_NICK");
             out.println("Serwer pobiera nick gracza...");
             out.flush();
@@ -117,6 +116,7 @@ public class MilionaireServer {
             nick = in.readLine();
             System.out.println(nick);
 
+            out.println("+-+");
             out.println("END_NICK");
             out.println("Nick został wczytany poprawnie przez serwer");
             out.flush();
