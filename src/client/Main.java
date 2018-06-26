@@ -62,21 +62,33 @@ public class Main {
         }
     }
 
+    private static String checkMessage(String s){
+        String s1, s2 = "pusty";
+
+        if(s.startsWith("+-+")){
+            s1 = s.substring(3,s.length());
+            if(s1.endsWith("-+-")){
+                s2 = s1.substring(0,s1.length()-3);
+            }
+            return s2;
+        }
+        return "BAD_MESSAGE";
+    }
+
     private static void play(String nick){
         try {
             boolean gameOver = false;
             socket = new Socket(host, port);
-            System.out.println("Polaczono z serwerem, \nOczekiwanie na drugiego gracza");
+            System.out.println("Polaczono z serwerem.");
 
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
 
             String message;
             do{
-                if(in.readLine().equals("+-+")){
-                    message = in.readLine();
+                    message = checkMessage(in.readLine());
                     switch (message) {
-                        case "PLAYER_DISCONNECTED":{
+                        case "PLAYER_DISCONNECTED": {
                             System.out.println("\n=======================================");
                             System.out.println("Przeciwnik sie rozłączył, wygrałeś grę :D");
                             break;
@@ -91,6 +103,7 @@ public class Main {
                         case "END_NICK": {
                             message = in.readLine();
                             System.out.println(message);
+                            System.out.println("Oczekiwanie na drugiego gracza...");
                             break;
                         }
                         case "CONNECTION": {
@@ -106,7 +119,7 @@ public class Main {
                             readMessages(endScore, "END_SCORE");
                             break;
                         }
-                        case "GAME_OVER":{
+                        case "GAME_OVER": {
                             gameOver = true;
                             System.out.println("Gra zostala zakonczona");
                             System.out.println("===========================================");
@@ -124,6 +137,7 @@ public class Main {
                             System.out.println(message);
                             Scanner scanner = new Scanner(System.in);
                             String answer = scanner.nextLine();
+                            System.out.println("Odpowiedziałeś " + answer + ", poczekaj na drugiego gracza.");
 
                             out.println("+-+");
                             out.println(answer.toLowerCase());
@@ -132,30 +146,30 @@ public class Main {
                         }
                         case "ASKED": {
                             boolean asked = false;
-                            readMessages(asked,"END_ASKED");
-                            try{
+                            readMessages(asked, "END_ASKED");
+                            try {
                                 TimeUnit.SECONDS.sleep(1);
-                            } catch (InterruptedException ex){
+                            } catch (InterruptedException ex) {
                                 System.out.println("Problem z odliczaniem czasu");
                             }
                             break;
                         }
                         case "NEXT_QUESTION": {
                             boolean nextQuestion = false;
-                            readMessages(nextQuestion,"END_NEXT_QUESTION");
-                            try{
+                            readMessages(nextQuestion, "END_NEXT_QUESTION");
+                            try {
 
                                 TimeUnit.SECONDS.sleep(3);
-                            } catch (InterruptedException ex){
+                            } catch (InterruptedException ex) {
                                 System.out.println("Problem z odliczaniem czasu");
                             }
                             break;
                         }
+                        default: {
+                            System.out.println("Otrzymano zły komunikat ze strony serwera!");
+                            break;
+                        }
                     }
-                }
-                else{
-                    System.out.println("Otrzymano zły komunikat ze strony serwera!");
-                }
             } while (!gameOver || !socket.isClosed());
         } catch (ServerException ex){
             System.out.println("Stracono połączenie z serwerem");

@@ -12,6 +12,12 @@ public class MilionaireServer {
     private ServerSocket serverSocket;
     private volatile boolean isServerWorking = true;
     private static int gameID = 1;
+    private final static String msgBeggining = "+-+";
+    private final static String msgEnding = "-+-";
+
+    private static String secureMessage(String msg){
+        return msgBeggining + msg + msgEnding;
+    }
 
     public MilionaireServer() {
 
@@ -82,8 +88,7 @@ public class MilionaireServer {
             in = new BufferedReader(new InputStreamReader(p.getSocket().getInputStream()));
             out = new PrintWriter(new OutputStreamWriter(p.getSocket().getOutputStream()));
 
-            out.println("+-+");
-            out.println("CONNECTION");
+            out.println(secureMessage("CONNECTION"));
             out.println("Serwer sprawdza, czy gracz jest nadal połączony...");
             out.flush();
 
@@ -108,16 +113,14 @@ public class MilionaireServer {
             BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             PrintWriter out  = new PrintWriter(new OutputStreamWriter(s.getOutputStream()));
 
-            out.println("+-+");
-            out.println("START_NICK");
+            out.println(secureMessage("START_NICK"));
             out.println("Serwer pobiera nick gracza...");
             out.flush();
 
             nick = in.readLine();
             System.out.println(nick);
 
-            out.println("+-+");
-            out.println("END_NICK");
+            out.println(secureMessage("END_NICK"));
             out.println("Nick został wczytany poprawnie przez serwer");
             out.flush();
         }

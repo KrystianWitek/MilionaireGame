@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Game {
-
+    private final static String msgBeggining = "+-+";
+    private final static String msgEnding = "-+-";
     private boolean gameExit = false;
     private int gameID;
     private Player p1 = null;
@@ -31,6 +32,10 @@ class Game {
         System.out.println("Gra nr: " + gameID);
         System.out.println("Player1 = " + p1.getNick() + "\nPlayer2 = " + p2.getNick());
         System.out.println("=============================================================");
+    }
+
+    private static String secureMessage(String msg){
+        return msgBeggining + msg + msgEnding;
     }
 
     void startGame(){
@@ -77,8 +82,7 @@ class Game {
                     // wysyłam do gracza prośbę o uzyskanine odpowiedzi
 
                     if (askForAnswer != 2) {
-                        out.println("+-+");
-                        out.println("GIVE_ME_ANSWER");
+                        out.println(secureMessage("GIVE_ME_ANSWER"));
                         out.println("Podaj odpowiedż");
                         out.flush();
                         askForAnswer++;
@@ -106,7 +110,7 @@ class Game {
             notifyPlayers();
 
         } catch (SocketException ex) {
-            System.out.println("Jeden z graczy się rozłączył");
+            System.out.println("Drugi gracz się rozłączył");
             whenPlayerDisconnected();
 //            ex.printStackTrace();
         } catch (IOException ex) {
@@ -120,15 +124,13 @@ class Game {
 
             for(Player p : players) {
                 PrintWriter out = new PrintWriter(new OutputStreamWriter(p.getSocket().getOutputStream()));
-                out.println("+-+");
-                out.println("SCORE");
+                out.println(secureMessage("SCORE"));
                 out.println("Twój wynik = " + p.getScore());
 
                 out.println(findWinner(p));
                 out.flush();
 
                 out.println("END_SCORE");
-
                 sendEndGame(out);
             }
             System.out.println("Gracze otrzymali swoje wyniki --- KONIEC GRY");
@@ -138,8 +140,7 @@ class Game {
     }
 
     private void sendEndGame(PrintWriter out) throws IOException{
-        out.println("+-+");
-        out.println("GAME_OVER");
+        out.println(secureMessage("GAME_OVER"));
         out.flush();
     }
 
@@ -149,8 +150,7 @@ class Game {
                 PrintWriter out = new PrintWriter(new OutputStreamWriter(p.getSocket().getOutputStream()));
 
                 gameExit = true;
-                out.println("+-+");
-                out.println("PLAYER_DISCONNECTED");
+                out.println(secureMessage("PLAYER_DISCONNECTED"));
                 out.flush();
 
                 sendEndGame(out);
@@ -165,8 +165,7 @@ class Game {
 
         // funkcja wysyła pytanie do gracza
 
-        out.println("+-+");
-        out.println("START_OF_QUESTION");
+        out.println(secureMessage("START_OF_QUESTION"));
         out.println("================================================================");
         out.println(question.getContent());
         out.println(question.getFirstAnswer());
@@ -182,8 +181,7 @@ class Game {
 
         // funkcja wysyła wiadomość do gracza o poprawnej odpowiedzi
 
-        out.println("+-+");
-        out.println("ASKED");
+        out.println(secureMessage("ASKED"));
         out.println("Poprawna odpowiedź");
         p.setScore(p.getScore() + 1);
         out.println("================================================================");
@@ -195,8 +193,7 @@ class Game {
 
         // funkcja wysyła wiadomość do gracza o złej odpowiedzi
 
-        out.println("+-+");
-        out.println("ASKED");
+        out.println(secureMessage("ASKED"));
         out.println("Zła odpowiedź");
         out.println("================================================================");
         out.println("END_ASKED");
@@ -214,8 +211,7 @@ class Game {
         try{
             for(Player p : players){
                 PrintWriter out = new PrintWriter(new OutputStreamWriter(p.getSocket().getOutputStream()));
-                out.println("+-+");
-                out.println("NEXT_QUESTION");
+                out.println(secureMessage("NEXT_QUESTION"));
                 out.println(currentScores());
                 out.println("\nPobieranie kolejnego pytania...\n");
                 out.println("END_NEXT_QUESTION");
