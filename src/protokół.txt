@@ -28,4 +28,5 @@ KOMENDY WYSY£ANE PRZEZ KLIENTA:
 CONNECTION_OK - gracz jest po³¹czony z serwerem
 
 
-"+-+" <- to jest znak, który musi staæ przed ka¿d¹ komend¹
++-+ <- znak znajduj¹cy siê przed komend¹
+-+- <- znak znajduj¹cy siê po komendzie

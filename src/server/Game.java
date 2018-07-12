@@ -1,9 +1,9 @@
 package server;
 import java.io.*;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
 
 class Game {
     private final static String msgBeggining = "+-+";
@@ -70,6 +70,7 @@ class Game {
         int answers = 0;
         int askForAnswer = 0;
         String msg;
+        boolean startCount = false;
 
         //  pętla obsługuje wczytywanie odpowiedzi od klientów
 

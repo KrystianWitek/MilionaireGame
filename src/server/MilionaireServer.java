@@ -7,7 +7,7 @@ import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class MilionaireServer {
+class MilionaireServer {
 
     private ServerSocket serverSocket;
     private volatile boolean isServerWorking = true;
@@ -19,8 +19,7 @@ public class MilionaireServer {
         return msgBeggining + msg + msgEnding;
     }
 
-    public MilionaireServer() {
-
+    MilionaireServer() {
         final int port = 9877;
         try {
             serverSocket = new ServerSocket(port);
@@ -30,11 +29,18 @@ public class MilionaireServer {
             System.exit(-1);
         }
 
+        getCurrentCalendarDate();
+        serviceConnections();
+    }
+
+    private void createServerSocket(){
+
+    }
+
+    private void getCurrentCalendarDate(){
         Calendar currentDate = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("E dd.MM.yyyy 'o godzinie' hh:mm");
         System.out.println("Serwer został uruchomiony w: " + dateFormat.format(currentDate.getTime()));
-
-        serviceConnections();
     }
 
     private void serviceConnections() {
@@ -45,12 +51,13 @@ public class MilionaireServer {
         while(isServerWorking){
             try{
                 socket = serverSocket.accept();
+                socket.setSoTimeout(30000);
                 playerQueue.add(createPlayer(socket));
 
                 // gdy serwer znajdzie 2 graczy uruchamia obsługę gry
 
                 if(playerQueue.size() == 2){
-                    if(checkPlayersConnection(playerQueue) == true){
+                    if(checkPlayersConnection(playerQueue)){
                         p1 = playerQueue.remove();
                         p2 = playerQueue.remove();
 

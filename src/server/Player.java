@@ -9,6 +9,15 @@ public class Player {
     private String nick;
     private Socket socket;
     private int isWon = 0;
+    private int timeOfAnswers = 0;
+
+    public int getTimeOfAnswers() {
+        return timeOfAnswers;
+    }
+
+    public void setTimeOfAnswers(int timeOfAnswers) {
+        this.timeOfAnswers = timeOfAnswers;
+    }
 
     public void setWon(int number){
         isWon = number;
