@@ -1,4 +1,6 @@
-package server;
+package server.repository;
+
+import server.questions.Question;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -37,9 +39,7 @@ public class ConnectionManager {
         return connection.createStatement().executeQuery(sqlQuery);
     }
 
-    public void showData() throws SQLException, ClassNotFoundException {
-
-        // funkcja do sprawdzania czy wszystkie pytania pobierają się bez problemu
+    public void showAllQuestions() throws SQLException, ClassNotFoundException {
 
         String sqlQuery = "select * from Pytania";
         ResultSet resultSet = getResult(sqlQuery);
@@ -53,7 +53,6 @@ public class ConnectionManager {
         for(int i=1; i<=numberOfColumns; ++i) {
             columns.add(metaData.getColumnName(i));
         }
-
         String columnsNames = "";
         for(String s : columns) {
             columnsNames += s + tab + tab;
@@ -78,9 +77,7 @@ public class ConnectionManager {
         }
     }
 
-    public Question getQuestion(int id) throws SQLException, ClassNotFoundException {
-
-        // funkcja do pobierania pojedyńczego pytania po id
+    public Question getQuestionByID(int id) throws SQLException, ClassNotFoundException {
 
         Question question = new Question();
         String sqlQuery = "SELECT * FROM Pytania WHERE idPytania = " + id;
@@ -106,7 +103,7 @@ public class ConnectionManager {
         while(resultSet.next()) {
             for(String s : columns) {
                 question.addToList(resultSet.getString(s));
-//                System.out.println(" dupa = " + resultSet.getString(s));
+//                System.out.println(" wynik = " + resultSet.getString(s));
             }
         }
         question.setAllData();

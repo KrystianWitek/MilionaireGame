@@ -27,6 +27,7 @@ class ClientGame {
             runClientMenuHandler();
         }
     }
+
     private static void runClientMenuHandler(){
         showMenu();
         System.out.println("Wybierz opcję: ");
@@ -49,6 +50,7 @@ class ClientGame {
                 System.out.println("Wybrałeś nieistniejącą opcję, spróbuj ponownie!");
         }
     }
+
     private static void startPlayerGame(){
         try {
             prepareConnectionSettings();
@@ -63,6 +65,7 @@ class ClientGame {
             System.out.println("Nie można wysłać wiadomości, serwer nie odpowiada");
         }
     }
+
     private static void managementMessagesFromServer() throws IOException {
         boolean gameOver = false;
         do{
@@ -126,6 +129,7 @@ class ClientGame {
             }
         } while (!gameOver || !socket.isClosed());
     }
+
     private static void readMessagesFromServer(String endOfMessage) throws IOException {
         boolean isTrue = false;
         while(!isTrue) {
@@ -136,6 +140,7 @@ class ClientGame {
                 System.out.println(message);
         }
     }
+
     private static void internalTimeCounter(int seconds){
         try {
             TimeUnit.SECONDS.sleep(seconds);
@@ -143,6 +148,7 @@ class ClientGame {
             System.out.println("Problem z odliczaniem czasu");
         }
     }
+
     private static String checkMessageCorrection(String messageFromServer){
         String msgBeggining;
         if(messageFromServer.startsWith("+-+")){
@@ -155,12 +161,14 @@ class ClientGame {
         }
         return "BAD_MESSAGE";
     }
+
     private static void prepareConnectionSettings() throws IOException {
         socket = new Socket(host, port);
         System.out.println("Polaczono z serwerem.");
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
     }
+
     private static void receiveMessageFromServer() throws IOException {
         String message = in.readLine();
         System.out.println(message);
@@ -169,41 +177,49 @@ class ClientGame {
         out.println(message);
         out.flush();
     }
+
     private static void showInformationsAboutPlayerScores(){
         System.out.println("=======================================");
         System.out.println("Wyniki");
         System.out.println("=======================================");
     }
+
     private static void showAuthorsInformations(){
         System.out.println("=======================================");
         System.out.println("Krystian Witek");
         System.out.println("=======================================");
     }
+
     private static void showMessageAfterEndGame(){
         System.out.println("Za kilka sekund nastąpi powrót do Menu Głównego...");
         internalTimeCounter(5);
         System.out.println("\n\n\n\n");
     }
+
     private static void endClientGame(){
         System.out.println("=======================================");
         exitFromLoop = true;
         System.out.println("Koniec gry");
     }
+
     private static void handlePlayerAnswer(){
         String answer = getLineFromScanner();
         System.out.println("Odpowiedziałeś " + answer + ", poczekaj na drugiego gracza.");
         out.println("+-+");
         sendMessageToServer(answer.toLowerCase());
     }
+
     private static void closeSocketConnections() throws IOException {
         in.close();
         out.close();
         socket.close();
         System.out.println("Połączenia zostały zamknięte pomyślnie");
     }
+
     private static String getLineFromScanner(){
         return scanner.nextLine();
     }
+
     private static void showMenu(){
         System.out.println("\nWitaj w Milionerach");
         System.out.println("1. Graj przez internet z drugim graczem");

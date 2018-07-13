@@ -1,4 +1,6 @@
-package server;
+package server.questions;
+
+import server.repository.ConnectionManager;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -6,34 +8,24 @@ import java.util.List;
 
 public class QuestionPool {
 
-    private Question question = null;
+    // zaczynam od 3 i koncze na 6  bo w bazie mam od 3 indexu ( jeszcze nie zmienione )
+    private static final int QUESTIONS_NUMBER = 6;
     private List<Question> listOfQuestions = new ArrayList<>();
 
     public List<Question> getListOfQuestions() {
         return listOfQuestions;
     }
 
-    public void prepareQuestions(){
-        generateQuestions(1);
-        generateQuestions(2);
-        generateQuestions(3);
-    }
-
-    public void generateQuestions(int questionLevel){
-        // ustawiam wszystkie dane łącząc się z bazą
+    public void generateQuestions(){
         createQuestions();
-        //showQuestions();
+//        showQuestions();
     }
 
     private void createQuestions() {
-        // zaczynam od 3 i koncze na 6  bo w bazie mam od 3 indexu ( jeszcze nie zmienione )
-        int counter = 6; // 6
-        Question question;
-
         try{
             ConnectionManager connectionManager = new ConnectionManager();
-            for(int i = 3; i < counter; i++){
-                question = connectionManager.getQuestion(i);
+            for(int i = 3; i < QUESTIONS_NUMBER; i++){
+                Question question = connectionManager.getQuestionByID(i);
                 listOfQuestions.add(question);
             }
         } catch (ClassNotFoundException | SQLException e) {
@@ -42,7 +34,8 @@ public class QuestionPool {
         System.out.println("Pytanie zostało wczytane poprawnie.");
     }
 
-    public void showQuestions(){
+    private void showQuestions(){
+        System.out.println("Wszystkie pytania:");
         for(Question q : listOfQuestions){
             q.showAllData();
         }

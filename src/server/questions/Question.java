@@ -1,4 +1,4 @@
-package server;
+package server.questions;
 
 import java.util.ArrayList;
 
