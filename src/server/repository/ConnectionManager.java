@@ -6,6 +6,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static server.config.ConnectionProperties.*;
+
 public class ConnectionManager {
 
     // jeśli nie uda się połączyć z bazą trzeba wejśc w ten plik SQLServerManager14.msc
@@ -16,9 +18,8 @@ public class ConnectionManager {
 
     private Connection getConnection() throws ClassNotFoundException, SQLException {
 
-        String driverName = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-        String datebaseName = "Milionerzy";
-        String url = "jdbc:sqlserver://DESKTOP-1ODQS4E\\SQLEXPRESS;databaseName=Milionerzy;integratedSecurity=true;";
+        String url = "jdbc:" + databaseKind + "://" + hostAddress + ";databaseName=" + databaseName +
+                "integratedSecurity=true;";
 
         Connection connection = null;
         try{
